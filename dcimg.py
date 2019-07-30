@@ -2,6 +2,7 @@ from bs4 import BeautifulSoup
 import re
 import requests
 import urllib
+import os
 
 def img_link(soup, name_list, url):
     if not os.path.isdir("./dcinside"):
