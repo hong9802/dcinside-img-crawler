@@ -4,9 +4,9 @@ import requests
 import urllib
 import os
 
-def img_link(soup, name_list, url):
-    if not os.path.isdir("./dcinside"):
-        os.mkdir("./dcinside")
+def img_link(soup, name_list, url, folder_name):
+    if not os.path.isdir(folder_name):
+        os.mkdir(folder_name)
     opener = urllib.request.build_opener()
     opener.addheaders = [("Referer", url)]
     urllib.request.install_opener(opener)
@@ -18,7 +18,7 @@ def img_link(soup, name_list, url):
         tmp_end_urlPoint = string_img_url.find("style=")
         string_img_url = string_img_url[tmp_start_urlPoint + 5:tmp_end_urlPoint-2]
         string_img_url = string_img_url.replace("amp;", "")
-        urllib.request.urlretrieve(string_img_url, "./dcinside/" + name_list[i])
+        urllib.request.urlretrieve(string_img_url, folder_name + "/" + name_list[i])
 
 def name(soup, name_list):
     ul_class = soup.find("ul", class_="appending_file")
@@ -30,6 +30,12 @@ def name(soup, name_list):
         string_name = string_name[tmp_start_namePoint + 1 : tmp_end_namePoint]
         name_list.append(string_name)
     name_list.sort()
+    
+def get_foldername(soup):
+    title_class = soup.find("span", class_="title_subject")
+    title_class = str(title_class)
+    title_class = title_class[title_class.find("title_subject") + 15:title_class.find("</span>")]
+    return title_class
 
 def debuging_request(r):
     f = open("debuger.txt", mode="wt", encoding="utf-8")
@@ -45,5 +51,7 @@ if __name__ == "__main__":
     r = requests.get(url, headers = headers)
     debuging_request(r.text)
     soup = BeautifulSoup(r.text, 'html.parser')
+    folder_name = "./"
+    folder_name += get_foldername(soup)
     name(soup, name_list)
-    img_link(soup, name_list, url)
+    img_link(soup, name_list, url, folder_name)
